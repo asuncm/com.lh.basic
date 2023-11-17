@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+com.lh.*
+config/*.config.yaml
+!config/env.local.yamls
+.idea
+go.sum
