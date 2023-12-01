@@ -17,23 +17,28 @@ services:
     port: "8000"
     database: "service"
     dataport: "36000"
+    workId: 1
   auth:
     host: "localhost"
     port: "8001"
     database: "auth"
     dataport: "36000"
+    workId: 2
   basic:
     host: "localhost"
     port: "8002"
     database: "basic"
     dataport: "36000"
+    workId: 3
   user:
     host: "localhost"
     port: "8003"
     database: "user"
     dataport: "36000"
+    workId: 4
   webService:
     host: "localhost"
     port: "8004"
     database: "webService"
     dataport: "36000"
+    workId: 5
