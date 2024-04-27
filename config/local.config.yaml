@@ -1,16 +1,10 @@
 namespace: "琅寰"
-name: "琅寰世界"
+name: "琅寰"
 version: "0.0.1"
-root:
-  linux: "/data/workspaces/com.lh.service.app"
-  windows: "d:/workspaces/com.lh.service.app"
+root: "com.lh.basic"
 database:
-  badger:
-    linux: "/data/badger"
-    windows: "d:/configuration/badger"
-  yugabyte:
-    linux: "/data/yugabyte"
-    windows: "d:/configuration/yugabyte"
+  badger: "BADGERDB"
+  yugabyte: "YUGABYTEDB"
 services:
   service:
     host: "localhost"
