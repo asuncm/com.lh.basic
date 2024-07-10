@@ -1,0 +1,7 @@
+errors:
+  uuid: "生成UUID失敗"
+  encrypt: "加密密碼串失敗"
+  password: "密碼錯誤,請輸入正確密碼"
+  decode: "解密密碼串失敗"
+  snowflake: "雪花算法出現異常"
+  SQLite: "數據庫打開失敗"

@@ -1,0 +1,7 @@
+errors:
+  uuid: "Failed to generate a UUID. Procedure"
+  encrypt: "Failed to encrypt the password string. Procedure"
+  password: "Incorrect password, please enter the correct password"
+  decode: "Failed to decrypt the password string"
+  snowflake: "The snowflake algorithm is abnormal. Procedure"
+  SQLite: "Database opening failure"
