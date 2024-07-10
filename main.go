@@ -1,33 +1,31 @@
 package main
 
 import (
-	"com.lh.service/tools"
+	"com.lh.basic/locales"
+	"com.lh.service/src/tools"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"os"
 	"strings"
 )
 
 func Config() (tools.MiddleConf, error) {
 	platform := tools.Platform("")
-	dir, _ := os.Getwd()
-	dir = strings.Replace(dir, "\\", "/", -1)
-	paths := []string{dir, "config", platform.Env + ".config.yaml"}
-	pathname := strings.Join(paths, "/")
+	pathname := tools.GetPath("LHPATH", fmt.Sprintf("%s%s%s", "config/", platform.Env, ".config.yaml"))
 	configs, err := tools.Yaml(pathname)
 	if err != nil {
 		return tools.MiddleConf{}, err
 	}
 	devServe := configs.Services["basic"]
-	root := configs.Root[platform.Platform]
-	database := configs.Database["badger"]
+	root := configs.Root
+	database := fmt.Sprintf("%s%s", configs.Database, "/pebble")
 	return tools.MiddleConf{
 		Platform:  platform.Platform,
 		Serve:     "basic",
 		Root:      root,
 		Host:      devServe.Host,
 		Port:      devServe.Port,
-		DataCache: database[platform.Platform],
+		DataCache: database,
 		DataPort:  devServe.DataPort,
 	}, err
 }
@@ -35,6 +33,7 @@ func main() {
 	router := gin.Default()
 	configs, _ := Config()
 	router.Use(tools.MiddleWare(configs))
+	locales.Init()
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "hello world!")
 	})
