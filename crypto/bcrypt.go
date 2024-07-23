@@ -2,7 +2,7 @@ package crypto
 
 import (
 	"com.lh.auth/locales"
-	"com.lh.service/src/tools"
+	"com.lh.service/tools"
 	"crypto/hmac"
 	"crypto/md5"
 	"encoding/base64"

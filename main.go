@@ -2,7 +2,7 @@ package main
 
 import (
 	"com.lh.basic/locales"
-	"com.lh.service/src/tools"
+	"com.lh.service/tools"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,22 +11,21 @@ import (
 
 func Config() (tools.MiddleConf, error) {
 	platform := tools.Platform("")
-	pathname := tools.GetPath("LHPATH", fmt.Sprintf("%s%s%s", "config/", platform.Env, ".config.yaml"))
+	root := tools.GetPath("LHPATH", "")
+	pathname := fmt.Sprintf("%s%s%s%s", root, "/config/", platform.Env, ".config.yaml")
 	configs, err := tools.Yaml(pathname)
 	if err != nil {
 		return tools.MiddleConf{}, err
 	}
 	devServe := configs.Services["basic"]
-	root := configs.Root
-	database := fmt.Sprintf("%s%s", configs.Database, "/pebble")
+	database := tools.GetPath(configs.Database, "pebble/basic")
 	return tools.MiddleConf{
-		Platform:  platform.Platform,
-		Serve:     "basic",
-		Root:      root,
-		Host:      devServe.Host,
-		Port:      devServe.Port,
-		DataCache: database,
-		DataPort:  devServe.DataPort,
+		Platform: platform.Platform,
+		Serve:    fmt.Sprintf("%s%s", root, "/com.lh.basic"),
+		Root:     root,
+		Host:     devServe.Host,
+		Port:     devServe.Port,
+		DataDir:  database,
 	}, err
 }
 func main() {
