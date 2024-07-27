@@ -4,6 +4,7 @@ import (
 	"com.lh.service/tools"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Option = map[string]tools.ServeConf
@@ -18,6 +19,7 @@ type Conf struct {
 var Config Conf
 
 func InitConfig(key string) {
+	Config = Conf{}
 	platform := tools.Platform("")
 	path := tools.GetPath("LHPATH", "")
 	Config.Root = path
@@ -29,6 +31,7 @@ func InitConfig(key string) {
 		Config.Name = config.Name
 		Config.Lists = config.Services
 		dir := os.Getenv(config.Database)
+		dir = strings.ReplaceAll(dir, "\\", "/")
 		Config.DataDir = dir
 	}
 }

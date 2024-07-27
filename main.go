@@ -3,8 +3,8 @@ package main
 import (
 	"com.lh.basic/config"
 	"com.lh.basic/locales"
-	"com.lh.service/pgx"
 	"com.lh.service/tools"
+	"com.lh.service/yugabyte"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,7 +14,7 @@ func main() {
 	router := gin.Default()
 	config.InitConfig("com.lh.basic")
 	configs := config.GetConfig("basic")
-	pgx.InitConfig()
+	yugabyte.InitConfig()
 	router.Use(tools.Cors())
 	//router.Use(tools.MiddleWare(configs))
 	locales.Init()
