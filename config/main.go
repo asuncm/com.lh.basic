@@ -4,6 +4,7 @@ import (
 	"com.lh.service/tools"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -16,27 +17,32 @@ type Conf struct {
 	Lists   Option `json:"lists"`
 }
 
-var Config Conf
+var options Conf
 
 func InitConfig(key string) {
-	Config = Conf{}
+	options = Conf{}
 	platform := tools.Platform("")
 	path := tools.GetPath("LHPATH", "")
-	Config.Root = path
+	options.Root = path
 	filename := fmt.Sprintf("%s/%s/%s/%s%s", path, key, "config", platform.Env, ".config.yaml")
 	config, err := tools.Yaml(filename)
 	if err != nil {
-		Config.Lists = Option{}
+		options.Lists = Option{}
 	} else {
-		Config.Name = config.Name
-		Config.Lists = config.Services
+		options.Name = config.Name
+		options.Lists = config.Services
 		dir := os.Getenv(config.Database)
 		dir = strings.ReplaceAll(dir, "\\", "/")
-		Config.DataDir = dir
+		options.DataDir = dir
 	}
 }
 
-func GetConfig(key string) tools.ServeConf {
-	opts := Config.Lists
+func GetServe(key string) tools.ServeConf {
+	opts := options.Lists
 	return opts[key]
+}
+
+func GetKey(key string) interface{} {
+	vals := reflect.ValueOf(options)
+	return vals.FieldByName(key).Interface()
 }

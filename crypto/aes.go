@@ -2,16 +2,17 @@ package crypto
 
 import (
 	"bytes"
-	"com.lh.service/tools"
+	basic "com.lh.basic/locales"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/hex"
 	"errors"
+	"github.com/gin-gonic/gin"
 )
 
 type AesConf struct {
 	ID    string `json:"id"`
-	Key   string `json:"Key"` // key支持16、24、32为加密数据
+	Key   string `json:"key"` // key支持16、24、32为加密数据
 	Value string `json:"value"`
 }
 
@@ -37,14 +38,14 @@ func cs7UnPadding(origData []byte, msg string) ([]byte, error) {
 }
 
 // 实现加密
-func AesEnCrypt(data AesConf, pathname string) (string, error) {
+func AesEnCrypt(data AesConf, c *gin.Context) (string, error) {
 	key := []byte(data.Key)
 	pw := []byte(data.Value)
 
 	cData, err := aes.NewCipher(key)
 	if err != nil {
-		config, _ := tools.Language(pathname)
-		return "", errors.New(config["aes"]["cliperError"])
+		val := basic.GetKey(c, []string{"errors", "encrypt"})
+		return "", errors.New(val)
 	}
 	cSize := cData.BlockSize()
 	//对数据进行填充，让数据长度满足需求
@@ -59,16 +60,17 @@ func AesEnCrypt(data AesConf, pathname string) (string, error) {
 }
 
 // 实现解密
-func AesDeCrypt(data AesConf, pathname string) (string, error) {
+func AesDeCrypt(data AesConf, c *gin.Context) (string, error) {
 	bytes, err := hex.DecodeString(data.Value)
-	config, _ := tools.Language(pathname)
 	if err != nil {
-		return "", errors.New(config["aes"]["hexError"])
+		val := basic.GetKey(c, []string{"errors", "decode"})
+		return "", errors.New(val)
 	}
 	key := []byte(data.Key)
 	cData, err := aes.NewCipher(key)
 	if err != nil {
-		return "", errors.New(config["aes"]["cliperError"])
+		val := basic.GetKey(c, []string{"aes", "encrypt"})
+		return "", errors.New(val)
 	}
 	//获取块大小
 	cSize := cData.BlockSize()
@@ -77,7 +79,8 @@ func AesDeCrypt(data AesConf, pathname string) (string, error) {
 	lists := make([]byte, len(bytes))
 	//这个函数也可以用来解密
 	cMode.CryptBlocks(lists, bytes)
-	lists, err = cs7UnPadding(lists, config["aes"]["csError"])
+	txt := basic.GetKey(c, []string{"aes", "decode"})
+	lists, err = cs7UnPadding(lists, txt)
 	if err != nil {
 		return "", err
 	}

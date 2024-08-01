@@ -1,37 +1,37 @@
 package crypto
 
 import (
-	"com.lh.auth/locales"
-	"com.lh.service/tools"
+	basic "com.lh.basic/locales"
 	"crypto/hmac"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"io"
-	"strings"
 	"time"
 )
 
 // 加密密码
-func Encrypt(p string, pathname string) (string, error) {
+func Encrypt(p string, c *gin.Context) (string, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(p), bcrypt.DefaultCost)
 	if err != nil {
-		config, _ := tools.Language(pathname)
-		return "", errors.New(config["bcrypt"]["error"])
+		val := basic.GetKey(c, []string{"errors", "encrypt"})
+		return "", errors.New(val)
 	}
 	return string(password), err
 }
 
 // 对加密校验
-func Decrypt(p string, enP string, pathname string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(enP), []byte(p))
+func Decrypt(oP string, nP string, c *gin.Context) error {
+	err := bcrypt.CompareHashAndPassword([]byte(oP), []byte(nP))
 	if err != nil {
-		config, _ := tools.Language(pathname)
-		return errors.New(config["bcrypt"]["errPW"])
+		arrs := []string{"errors", "verifyPW"}
+		msg := basic.GetKey(c, arrs)
+		return errors.New(msg)
 	}
 	return err
 }
@@ -42,7 +42,7 @@ func UUID(c *gin.Context) (string, error) {
 	id, err := uuid.FromString(v4.String())
 	if err != nil {
 		arrs := []string{"errors", "uuid"}
-		msg := locales.GetKey(c, arrs)
+		msg := basic.GetKey(c, arrs)
 		return "", errors.New(msg)
 	}
 	return id.String(), err
@@ -52,8 +52,7 @@ func UUID(c *gin.Context) (string, error) {
 func Md5(value string) string {
 	if value == "" {
 		now := time.Now()
-		dates := []string{string(now.UnixNano()), string(now.Nanosecond())}
-		value = strings.Join(dates, "")
+		value = fmt.Sprintf("%d_%d", now.UnixNano(), now.Nanosecond())
 	}
 	md := md5.New()
 	io.WriteString(md, value)
@@ -71,15 +70,15 @@ func EnBase(value string) string {
 func DeBase(value string, c *gin.Context) (string, error) {
 	base, err := base64.StdEncoding.DecodeString(value)
 	if err != nil {
-		arrs := []string{"errors", "base64"}
-		msg := locales.GetKey(c, arrs)
-		return "", errors.New(msg)
+		arrs := []string{"errors", "decode"}
+		msg := basic.GetKey(c, arrs)
+		return "", errors.New(fmt.Sprintf("base64 %s", msg))
 	}
 	return string(base), err
 }
 
 // hmac加密
-func Hmac(value string, key string, dir string) string {
+func Hmac(value string, key string) string {
 	hma := hmac.New(md5.New, []byte(key))
 	hma.Write([]byte(value))
 	return hex.EncodeToString(hma.Sum([]byte("")))
